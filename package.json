@@ -1,0 +1,29 @@
+{
+  "name": "controlgui",
+  "version": "1.0.0",
+  "description": "please help me",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "watch": "vite build --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "draw2d": "^1.0.38",
+    "expr-eval": "^2.0.2",
+    "jquery": "^3.6.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.1.0",
+    "laravel-vite-plugin": "^0.7.4",
+    "vite": "^4.2.1"
+  }
+}
