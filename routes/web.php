@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/project', [ProjectsController::class, 'create']);
 
     // exisitng project --------------------------
-        Route::get('/project/{id}', [ProjectsController::class, 'gui'])->name("gui"); //main gui page
+        Route::get('/project/{id}', [ProjectsController::class, 'design'])->name("gui"); //main gui page
        Route::get('/projects/simulate', [ProjectsController::class, 'simulate']); //simulation test page
 
         Route::get('/project/{id}/edit', [ProjectsController::class, 'edit'])->name("editp"); //edit project details

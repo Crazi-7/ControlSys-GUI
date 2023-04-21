@@ -137,7 +137,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 600px;
+            width: 650px;
             font-size: 50px;
             font-weight:bold;
             display: flex;
@@ -406,7 +406,7 @@
             height:100%;
             width:100%;
         }
-         button 
+         button, a
         {
             background: none;
             color: inherit;
@@ -417,6 +417,7 @@
             outline: inherit;
             height:100%;
             width:100%;
+            text-decoration: none;
         } 
         span
         {
@@ -459,13 +460,15 @@
         .hidden 
         {
             display:none;
-        }
+        } 
+      
     </style>
 </head>
 <body id="container">
     <div id="canvas"> </div>
         <!-- SUBHEADER-->
         <div class="subheader">
+        <div class="subheader-element clickable"><a href="{{route('home')}}">Home</a></div>
             <div class="subheader-element clickable"><p>File</p></div>
             <div class="subheader-element clickable"><p>Save</p></div>
             <div class="subheader-element clickable" id="undo-button"><i class="material-symbols-outlined vcentre">undo</i></div>
