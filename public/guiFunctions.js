@@ -1,3 +1,42 @@
+function pageFirst()
+{
+    console.log("1");
+    const pages = document.getElementsByClassName("property-page-container");
+    const headers = document.getElementsByClassName("property-page-header");
+            pages[0].classList.remove("vertical-moved");
+            pages[1].classList.remove("vertical-moved");
+            pages[2].classList.remove("vertical-moved");
+            headers[0].classList.remove("vertical-moved");
+            headers[1].classList.remove("vertical-moved");
+            headers[2].classList.remove("vertical-moved");
+}
+function pageSecond()
+{
+    console.log("2");
+    const pages = document.getElementsByClassName("property-page-container");
+    const headers = document.getElementsByClassName("property-page-header");
+    pages[0].classList.add("vertical-moved");
+    pages[1].classList.remove("vertical-moved");
+    pages[2].classList.remove("vertical-moved");
+    headers[0].classList.add("vertical-moved");
+    headers[1].classList.remove("vertical-moved");
+    headers[2].classList.remove("vertical-moved");
+}
+function pageThird()
+{
+    console.log("3");
+    const pages = document.getElementsByClassName("property-page-container");
+    const headers = document.getElementsByClassName("property-page-header");
+    pages[0].classList.add("vertical-moved");
+    pages[1].classList.add("vertical-moved");
+    pages[2].classList.remove("vertical-moved");
+    headers[0].classList.add("vertical-moved");
+    headers[1].classList.add("vertical-moved");
+    headers[2].classList.remove("vertical-moved");
+}
+
+
+
 function addComponent(item)
     {
         

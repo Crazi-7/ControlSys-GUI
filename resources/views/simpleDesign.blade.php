@@ -19,10 +19,19 @@
     <script src="{{URL('engine/PropertyPane.js')}}"></script>
     <script type="text/javascript">
     var app;
+    let simJson;
+    
     window.addEventListener("DOMContentLoaded", () => { //check if loaded
         document.getElementById("show").addEventListener("click", toggleSideBar);
         document.getElementById("hide-button").addEventListener("click", toggleSideBar);
         document.getElementById("edit-bar-button").addEventListener("click", toggleEdit);
+        
+        document.getElementsByClassName("property-page-header")[0].addEventListener("click", pageFirst);
+        document.getElementsByClassName("property-page-header")[1].addEventListener("click", pageSecond);
+        document.getElementsByClassName("property-page-header")[2].addEventListener("click", pageThird);
+        document.getElementsByClassName("property-page-container")[0].addEventListener("click", pageFirst);
+        document.getElementsByClassName("property-page-container")[1].addEventListener("click", pageSecond);
+        document.getElementsByClassName("property-page-container")[2].addEventListener("click", pageThird);
         const allComponents = document.getElementsByClassName("component-wrapper");
         
         Array.prototype.forEach.call(allComponents, (item) => {
@@ -94,7 +103,6 @@
         {
             const editButton = document.getElementsByClassName("tool")[2];
             editButton.classList.add("clicked");
-            
             const addbar = document.getElementsByClassName("add-bar")[0];
             addbar.classList.add("hidden");
             const editbar = document.getElementsByClassName("edit-bar")[0];
@@ -306,7 +314,7 @@
             background-color: #5b5b5b;
             border-radius: 20px;
         }
-        .add-bar
+        .add-bar, .edit-bar
         {
             margin-left:12%;
         }
@@ -461,7 +469,122 @@
         {
             display:none;
         } 
-      
+        .property-pages
+        {
+            height:600px;
+            color:#b1b1b1;
+        }
+    
+        .p-headers 
+        {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            color:#b1b1b1;
+        }
+        .property-page-header
+        {
+        
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            text-align: center;
+            font-size:30px;
+            font-weight: bold;
+            background-color: #525252;
+            width:150px;
+            padding:10px 10px;
+            z-index:4;
+            transition: transform 300ms ease-in-out;
+        }
+        .property-page-container 
+        {
+            border-top-left-radius: 10px;
+            width:100%;
+          /*  background-color: #525252;*/
+            height: 600px;
+            padding-top: 20px;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: flex-start;
+            row-gap: 15px;
+            position: absolute;
+            width:100%; 
+            transition: transform 300ms ease-in-out;
+        }
+        .property-category 
+        {
+           /* background-color:#575757;*/
+            background-color: inherit;
+            filter: brightness(1.1);
+            width:100%;
+            padding:10px;
+            border-radius: 10px;
+        }
+        .property-category-heading 
+        {
+            font-size: 25px;
+        }
+        .property-category-body 
+        {
+            background-color: inherit;
+        }
+        .property-category-body>*
+        {
+            font-size: 25px;
+            background-color: inherit;
+        }
+        .property-section 
+        {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            column-gap: 15px;
+            align-items: center;
+            margin:10px;
+            background-color: inherit;
+        }
+        .property-label 
+        {
+            width:160px;
+            text-align: center;
+        }
+        .property-value
+        {
+            background-color: inherit;
+        }
+        .property-value>input
+        {
+            border-radius: 10px;
+            border-style: none;
+            height: 30px;
+         /*   background-color: #5b5b5b;*/
+            background-color: inherit;
+            filter: brightness(1.2);
+            width: 300px;
+            overflow-x:scroll;
+            padding:5px 10px;
+            color:#d9d9d9;
+        }
+        .value-page
+        {
+            z-index: 1;
+            background-color: #4f4f5b;
+        }
+        .simulation-page 
+        {
+            z-index:2;  
+            background-color: #4f545b;
+        }
+        .custom-page 
+        {
+            z-index: 0;
+            background-color: #574e5c;
+        }
+        .vertical-moved 
+        {
+            transform: translateY(500px);
+            transition: transform 300ms ease-out;
+        }
     </style>
 </head>
 <body id="container">
@@ -503,6 +626,7 @@
 
         <!-- SIDEBAR-->
         <div class="sidebar sidebar--isHidden">
+            <div id="hide-button" class="clickable vcentre"><i class="material-icons">chevron_right</i></div>
             <!-- ADDBAR-->
             <div class="add-bar">
                 <div class="vcentre">
@@ -536,7 +660,7 @@
                     </div>
                 </div>
 
-
+                <div></div>
                 <!-- FUNCTIONS-->
                 <div class="add-bar-element add-bar-functions">
                     <div class="add-section-head">Functions:</div>
@@ -591,14 +715,72 @@
                 <div class="vcentre">
                     <div class="add-bar-element add-bar-header vcentre">Edit Element:</div> 
                 </div>
-
-                <div id="propertyPane">
+                <div class="p-headers">
+                    <div class="property-page-header simulation-page">Simulation</div>
+                    <div class="property-page-header value-page" id="values-header">Values</div>
+                    <div class="property-page-header custom-page" id="custom-header">Customise</div>
                 </div>
-                <div id="properties">
+                <div class="property-pages">
+
+                        <div class="property-page-container simulation-page" style="border-top-left-radius: 0px;">
+                            
+                                <div class="property-category">
+                                    <div class="property-category-heading">Transfer</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">num</div><div class="property-value"> <input id="property_position_x" type="text" class="form-control"/></div></div>
+                                        <div class="property-section"><div class="property-label">den</div><div class="property-value"> <input id="property_position_y" type="text" class="form-control"/></div></div>
+                                    </div>
+                                </div>
+
+                                <div class="property-category">
+                                    <div class="property-category-heading">Debug</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="property_id" type="text" class="form-control"/></div></div>
+                                    </div>
+                                </div>
+ 
+                        </div>
+
+                        <div class="property-page-container value-page">
+                                <div class="property-category">
+                                    <div class="property-category-heading">Position</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">x</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                                        <div class="property-section"><div class="property-label">y</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                                    </div>
+                                </div>
+
+                                <div class="property-category">
+                                    <div class="property-category-heading">Debug</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                  
+
+                
+                        <div class="property-page-container custom-page">
+                                <div class="property-category">
+                                    <div class="property-category-heading">Coloring</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">Background Color</div><div class="property-value"> <input id="property_bg_color" type="text" class="form-control"/></div></div>
+                                        <div class="property-section"><div class="property-label">Color</div><div class="property-value"> <input id="property_color" type="text" class="form-control"/></div></div>
+                                    </div>
+                                </div>
+
+                                <div class="property-category">
+                                    <div class="property-category-heading">Debug</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                                    </div>
+                                </div>
+                        </div>
+                    
+                
                 </div>
             </div>
 
-            <div id="hide-button" class="clickable vcentre"><i class="material-icons">chevron_right</i></div>
         </div>
     
     

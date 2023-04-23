@@ -36,7 +36,6 @@ example.PropertyPane = Class.extend({
         }
 	},
 
-
 	/**
 	 * @method
 	 * Called if the selection in the canvas has been changed. You must register this
@@ -48,38 +47,7 @@ example.PropertyPane = Class.extend({
 	{
         // Set some good defaults
         // (better you create  new class and set the defaults in the init method)
-        var userData = figure.getUserData();
-        if(userData===null){
-          figure.setUserData(userData={name:""});   
-        }
-        
-        // simple x/y coordinate display
-        //
-        this.html.append(
-                '<div id="property_position_container" class="panel panel-default">'+
-                ' <div class="panel-heading " >'+
-                '     Position'+
-                '</div>'+
-                ' <div class="panel-body" id="position_panel">'+
-                '   <div class="form-group">'+
-                '       <div class="input-group" ></div> '+
-                '       x <input id="property_position_x" type="text" class="form-control"/><br>'+
-                '       y <input id="property_position_y" type="text" class="form-control"/>'+
-                '   </div>'+
-                ' </div>'+
-                '</div>'+
-                
-                '<div id="property_position_container" class="panel panel-default">'+
-                ' <div class="panel-heading " >'+
-                '     Custom Property'+
-                '</div>'+
-                ' <div class="panel-body" id="userdata_panel">'+
-                '   <div class="form-group edit-section">'+
-                '       <div class="input-group edit-name" > '+ 
-                '       Value </div><input id="property_name" type="text" class="form-control edit-field" value="'+figure.getUserData().name+'"/>'+
-                '   </div>'+
-                ' </div>'+
-                '</div>');
+     
         
     	// Databinding: Figure --> UI
         //
@@ -87,8 +55,16 @@ example.PropertyPane = Class.extend({
     	figure.on("move",function(){
     		if(isInUpdate) return;
     		isInUpdate = true; // avoid recursion
+
+            //values
     		$("#property_position_x").val(figure.getPosition().x);
        		$("#property_position_y").val(figure.getPosition().y);
+            $("#property_id").val(figure.id);
+
+            //style
+            $("#property_bg_color").val(figure.bgColor);
+            $("#property_color").val(figure.color);
+            console.log(figure);
        		isInUpdate=false;
        	});
     	

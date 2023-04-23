@@ -177,13 +177,12 @@
             text-align: center;
             color: #dc4e4e;
         }
-        
         a
         {
             color: inherit; /* blue colors for links too */
             text-decoration: inherit; /* no underline */
-   
         }
+
     </style>
 </head>
 <body>
