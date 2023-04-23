@@ -40,6 +40,7 @@ function pageThird()
 function addComponent(item)
     {
         
+        
        var color;
         switch(item.currentTarget.childNodes[3].className.substr(25)) 
         {
@@ -97,4 +98,121 @@ function addComponent(item)
         })
         var rect = new LabelRectangle({width:100, height:80,bgColor: color, radius: 10});
         app.view.add(rect, 150+Math.random()*150,150+Math.random()*100);
+
+
+
+        let details;
+
+        switch(item.currentTarget.childNodes[3].innerHTML)
+        {
+            case "Step":
+                details =
+                {
+                    input_type: "step",
+                    input_details: 
+                    {
+                        step_value: 1,
+                        step_time: 1
+                    }
+                };
+                break;
+            case "Impulse":
+                details =
+                {
+                    input_type: "impulse",
+                    input_details: 
+                    {
+                        impulse_value: 1,
+                        impulse_time: 1
+                    }
+                };
+                break;
+            case "Polynomial":
+                details =
+                {
+                    input_type: "polynomial",
+                    input_details: 
+                    {
+                        function: [1,1]
+                    }
+                };
+                break;
+            case "Trig":
+                details =
+                {
+                    input_type: "trig",
+                    input_details: 
+                    {
+                        amplitude: 1,
+                        frequency: 1,
+                        phase: 0,
+                    }
+                };
+                break;
+            case "Constant":
+                details =
+                {
+                    input_type: "constant",
+                    input_details: 
+                    {
+                        value: 1
+                    }
+                };
+                break;
+            case "Adder":
+                details =
+                {
+                    input_nets: [1,1],
+                    input_signs: [1,1] 
+                };
+                break;
+            case "Integrator":
+                details =
+                {
+                    initial_value: 0,
+                    input_net: -1
+                };
+                break;
+            case "Transfer Function":
+                details =
+                {  
+                    transfer_function: [[1],[1,1]],
+                    input_net: -1,
+		            xk: []    
+                };
+                break;
+            case "Gain":
+                details =
+                {  
+                    gain: 5,
+                    input_net: -1,
+                };
+                break;
+            case "Buffer":
+                details =
+                {  
+                    input_net: -1
+                };
+                break;
+            case "Scope":
+                details =
+                {  
+                    time: [],
+                    series: [],
+                    inputs: 1,  
+                };
+                break;
+
+        }
+        simJson.blocks.push(
+            {
+                category: item.currentTarget.childNodes[3].className.substr(25),
+                type: item.currentTarget.childNodes[3].innerHTML,
+                name: item.currentTarget.childNodes[3].innerHTML,
+                id: rect.id,
+                output_net: "nothing",
+                details:details
+            });
+
+            console.log(simJson);
     }

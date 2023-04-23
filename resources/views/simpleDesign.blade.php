@@ -19,8 +19,9 @@
     <script src="{{URL('engine/PropertyPane.js')}}"></script>
     <script type="text/javascript">
     var app;
-    let simJson;
-    
+    let jsontext = '{ "blocks" : [], "nets": []}';
+    let simJson = JSON.parse(jsontext);
+
     window.addEventListener("DOMContentLoaded", () => { //check if loaded
         document.getElementById("show").addEventListener("click", toggleSideBar);
         document.getElementById("hide-button").addEventListener("click", toggleSideBar);
@@ -685,14 +686,14 @@
                             <div class="component vcentre"><i class="material-icons vcentre">input</i></div>
                             <div class="component-header vcentre functionsy">Buffer</div>
                         </div>
-                        <div class="component-wrapper clickable">
+                        <!-- <div class="component-wrapper clickable">
                             <div class="component vcentre"><i class="material-icons vcentre">waves</i></div>
                             <div class="component-header vcentre functionsy">Trig</div>
                         </div>
                         <div class="component-wrapper clickable">
                             <div class="component vcentre"><i class="material-icons vcentre">timeline</i></div>
                             <div class="component-header vcentre functionsy">Polynomial</div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -758,7 +759,6 @@
                                 </div>
                             </div>
                   
-
                 
                         <div class="property-page-container custom-page">
                                 <div class="property-category">
