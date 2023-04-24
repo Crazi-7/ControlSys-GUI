@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{URL('favicon.ico')}}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
     <script src="{{URL('math.js')}}" type="text/javascript"></script>
     <script src="{{URL('jquery.js')}}" type="text/javascript"></script>
@@ -128,6 +130,7 @@
         addButton.classList.remove("clicked");
         //document.getElementById("toggle").innerHTML = sidebarEl.classList.contains("sidebar--isHidden")? "Show Sidebar": "Hide Sidebar";
     }
+    
     </script>
     <script src="{{URL('guiFunctions.js')}}"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -135,6 +138,9 @@
     <title>Design tester</title>
 
     <style>
+        div>mjx-container[jax="CHTML"][display="true"] {
+            display:inline;
+        }
         body 
         {
             margin: 0px;
@@ -512,7 +518,8 @@
             width:100%;
           /*  background-color: #525252;*/
             height: 600px;
-            padding-top: 20px;
+            
+            padding: 30px 10px 10px 10px;
             display: flex;
             flex-flow: column nowrap;
             justify-content: flex-start;
@@ -534,6 +541,7 @@
         .property-category-heading 
         {
             font-size: 25px;
+            text-decoration: underline;
         }
         .property-category-body 
         {
@@ -563,7 +571,7 @@
         {
             background-color: inherit;
         }
-        .property-value>input
+        .property-value>input, .property-value>div
         {
             border-radius: 10px;
             border-style: none;
@@ -571,8 +579,8 @@
          /*   background-color: #5b5b5b;*/
             background-color: inherit;
             filter: brightness(1.2);
-            width: 300px;
-            overflow-x:scroll;
+            width: 258px;
+          
             padding:5px 10px;
             color:#d9d9d9;
         }
@@ -596,6 +604,120 @@
             transform: translateY(500px);
             transition: transform 300ms ease-out;
         }
+        .color1[type="color"] {
+        -webkit-appearance: none;
+        -moz-appearance: none;     
+        cursor: pointer;
+        overflow:hidden;
+        padding: 0;
+        }
+        .color1::-webkit-color-swatch {
+        border-radius: 15px;
+        border: none;
+        }
+        .color1::-moz-color-swatch {
+        border-radius: 15px;
+        border: none;
+        }
+    
+
+.radio-section {
+    height:50px;
+}
+
+.button-cover, .knobs, .layer
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.button
+{
+    position: relative;
+    
+    width: 74px;
+    height: 36px;
+    
+    overflow: hidden;
+}
+
+.button.r, .button.r .layer
+{
+    border-radius: 100px;
+}
+
+.button.b2
+{
+    border-radius: 2px;
+}
+
+.checkbox
+{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.knobs
+{
+    z-index: 2;
+}
+
+.layer
+{
+    width: 100%;
+    background-color: inherit;
+    filter: brightness(1.2);
+    transition: 0.3s ease all;
+    z-index: 1;
+}
+
+/* Button 1 */
+#button-1 .knobs:before
+{
+    content: '+';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 10px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    padding: 9px 4px;
+    background-color: #8b6196;
+    border-radius: 50%;
+    transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;
+}
+
+#button-1 .checkbox:checked + .knobs:before
+{
+    content: '-';
+    left: 42px;
+    background-color: #af72b8;
+}
+
+#button-1 .checkbox:checked ~ .layer
+{
+    background-color: inherit;
+    filter: brightness(1.2);
+}
+
+#button-1 .knobs, #button-1 .knobs:before, #button-1 .layer
+{
+    transition: 0.3s ease all;
+}
+
     </style>
 </head>
 <body id="container">
@@ -733,31 +855,13 @@
                 </div>
                 <div class="property-pages">
 
-                        <div class="property-page-container simulation-page" style="border-top-left-radius: 0px;">
+                        <div class="property-page-container simulation-page" style="border-top-left-radius: 0px;" id="simulation_page">
                             
-                                <div class="property-category">
+                                <!-- <div class="property-category">
                                     <div class="property-category-heading">Transfer</div>
                                     <div class="property-category-body">
-                                        <div class="property-section"><div class="property-label">num</div><div class="property-value"> <input id="property_position_x" type="text" class="form-control"/></div></div>
-                                        <div class="property-section"><div class="property-label">den</div><div class="property-value"> <input id="property_position_y" type="text" class="form-control"/></div></div>
-                                    </div>
-                                </div>
-
-                                <div class="property-category">
-                                    <div class="property-category-heading">Debug</div>
-                                    <div class="property-category-body">
-                                        <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="property_id" type="text" class="form-control"/></div></div>
-                                    </div>
-                                </div>
- 
-                        </div>
-
-                        <div class="property-page-container value-page">
-                                <div class="property-category">
-                                    <div class="property-category-heading">Position</div>
-                                    <div class="property-category-body">
-                                        <div class="property-section"><div class="property-label">x</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
-                                        <div class="property-section"><div class="property-label">y</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                                        <div class="property-section"><div class="property-label">num</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                                        <div class="property-section"><div class="property-label">den</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
                                     </div>
                                 </div>
 
@@ -766,23 +870,52 @@
                                     <div class="property-category-body">
                                         <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
                                     </div>
+                                </div> -->
+ 
+                        </div>
+
+                        <div class="property-page-container value-page">
+                                <div class="property-category"  id="position_panel">
+                                    <div class="property-category-heading">Position</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">x</div><div class="property-value"> <input id="property_position_x" type="text" class="form-control"/></div></div>
+                                        <div class="property-section"><div class="property-label">y</div><div class="property-value"> <input id="property_position_y" type="text" class="form-control"/></div></div>
+                                    </div>
+                                </div>
+
+                                <div class="property-category">
+                                    <div class="property-category-heading">Debug</div>
+                                    <div class="property-category-body">
+                                        <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="property_id" type="text" class="form-control"/></div></div>
+                                        <div class="property-section radio-section"><div class="property-label">id</div>
+                                            
+                                                <div class="button r" id="button-1">
+                                                    <input type="checkbox" class="checkbox">
+                                                    <div class="knobs"></div>
+                                                    <div class="layer"></div>
+                                                </div>
+                                            
+                                        </div>
+                                    
+                                    
+                                    </div>
                                 </div>
                             </div>
                   
                 
-                        <div class="property-page-container custom-page">
+                        <div class="property-page-container custom-page" id="color_panel">
                                 <div class="property-category">
                                     <div class="property-category-heading">Coloring</div>
                                     <div class="property-category-body">
-                                        <div class="property-section"><div class="property-label">Background Color</div><div class="property-value"> <input id="property_bg_color" type="text" class="form-control"/></div></div>
-                                        <div class="property-section"><div class="property-label">Color</div><div class="property-value"> <input id="property_color" type="text" class="form-control"/></div></div>
+                                        <div class="property-section"><div class="property-label">Background Color</div><div class="property-value"> <input id="property_bg_color" type="color" class="form-control color1"/></div></div>
+                                        <div class="property-section"><div class="property-label">Border Color</div><div class="property-value"> <input id="property_border_color" type="color" class="form-control color1"/></div></div>
                                     </div>
                                 </div>
     
                                 <div class="property-category">
                                     <div class="property-category-heading">Graph</div>
                                     <div class="property-category-body">
-                                        <div id="simulation-graph" style="width:500px;height:500px;"></div>
+                                        
                                     </div>
                                 </div>
                         </div>

@@ -1,6 +1,5 @@
 function pageFirst()
-{
-    console.log("1");
+{   
     const pages = document.getElementsByClassName("property-page-container");
     const headers = document.getElementsByClassName("property-page-header");
             pages[0].classList.remove("vertical-moved");
@@ -11,8 +10,7 @@ function pageFirst()
             headers[2].classList.remove("vertical-moved");
 }
 function pageSecond()
-{
-    console.log("2");
+{   
     const pages = document.getElementsByClassName("property-page-container");
     const headers = document.getElementsByClassName("property-page-header");
     pages[0].classList.add("vertical-moved");
@@ -24,7 +22,6 @@ function pageSecond()
 }
 function pageThird()
 {
-    console.log("3");
     const pages = document.getElementsByClassName("property-page-container");
     const headers = document.getElementsByClassName("property-page-header");
     pages[0].classList.add("vertical-moved");
@@ -146,6 +143,7 @@ function addComponent(item)
                         amplitude: 1,
                         frequency: 1,
                         phase: 0,
+                        dc: 0
                     }
                 };
                 break;
@@ -226,10 +224,8 @@ function addComponent(item)
         simJson.nets = [];
         let linus = app.view.lines.data;
         linus.forEach((value) => addWirings(value));//adds wirings to simJson
-        adderBind("Adder");
-        adderBind("Transfer Function");
-        adderBind("Integrator");
-        adderBind("Scope");
+        adderBind();
+        
         console.log("sim:");
         console.log(simJson);
         generate();
@@ -256,13 +252,18 @@ function addComponent(item)
     }
 
 
-    function adderBind(blockType) 
+    function adderBind() 
     {
         //the goal of this function is to bind the adder ports in connected order
-        let adders = simJson.blocks.filter(block => block.type == blockType);
+        let adders = simJson.blocks.filter(block => block.category != "sources");
         let linus = app.view.lines.data;
         
         adders.forEach(function (adder) {
+                if (adder.type == "Scope") //clear the outputs on every simulaiton run
+                {
+                    adder.details.time = [];
+                    adder.details.series = [];
+                }
                 let filtered = linus.filter(linez => linez.targetPort.parent.id === adder.id); //all connected ports to said adder
                 let ports = app.view.figures.data.find(block => block.id == adder.id).inputPorts; // find the original blocks input ports
                 ports.data.forEach(function (port, index){       //check if the input ports are wired          
@@ -438,45 +439,6 @@ function addComponent(item)
         time += timeStep;
         }
 
-        simulationG = document.getElementById('simulation-graph');
-            Plotly.newPlot( simulationG, [{
-            x: domain,
-            y: results }], 
-            {
-                    
-                    title:{
-                    text: 'Input Response',
-                    font: {
-                        size: 23,
-                        color: 'lightgrey',
-                    }
-                    } ,
-                    color: "lightgrey",
-                margin: { t: 50 },
-                plot_bgcolor: "#555",
-                paper_bgcolor: "#555555",
-                xaxis: {
-                    title: 'Time (s)',
-                    color: 'lightgrey',
-                    titlefont: {
-                        family: 'Arial, sans-serif',
-                        size: 18,
-                        color: 'lightgrey'
-                    },
-                },
-                yaxis: {
-                    title: 'Output',
-                    color: 'lightgrey',
-                    titlefont: {
-                        family: 'Arial, sans-serif',
-                        size: 18,
-                        color: 'lightgrey'
-                    },
-                }
-
-            
-            } );
-
     }
     
     
@@ -572,19 +534,106 @@ function addComponent(item)
                 netValues[item.output_net] = sum;
                 break;
             case "Step":
-                if (time >= 1)
-                    netValues[item.output_net] = 1;
+                if (time >= item.details.input_details.step_time)
+                    netValues[item.output_net] = item.details.input_details.step_value;
                 else
                     netValues[item.output_net] = 0;
                 console.log("stepped:"+ netValues[item.output_net]);
                 console.log("to:",item.output_net);
                 break;
-            case "Scope":
+            
+            case "Impulse":
+                if (Math.abs(parseFloat(item.details.input_details.impulse_time) - time) <= 0.000001)
+                    netValues[item.output_net] = item.details.input_details.impulse_value;
+                else
+                    netValues[item.output_net] = 0;
+                console.log("stepped:"+ netValues[item.output_net]);
+                console.log("to:",item.output_net);
+                break;
 
-                console.log("scopiee" + getNet(item.details.input_net))
-                results.push(getNet(item.details.input_net));
-                domain.push(time);
+            case "Trig":
+                
+                //    netValues[item.output_net] = item.details.input_details.step_value;
+                
+                netValues[item.output_net] = (item.details.input_details.amplitude* Math.sin(item.details.input_details.frequency* 2 * Math.PI * (time - item.details.input_details.phase)) + item.details.input_details.dc);
+                console.log("stepped:"+ netValues[item.output_net]);
+                console.log("to:",item.output_net);
+                break;
+
+            case "Polynomial":
+                let coeff = item.details.input_details.function;
+                coeff = coeff.reverse();
+                const total = coeff.reduce((res, cur, i) => {
+                    res += cur * Math.pow(time,i);
+                    return res;
+                }, 0);
+                netValues[item.output_net] = total;
+                break;
+            
+
+            case "Constant":
+                
+                    netValues[item.output_net] = item.details.input_details.value;
+              
+                console.log("stepped:"+ netValues[item.output_net]);
+                console.log("to:",item.output_net);
+                break;
+            case "Gain":
+                netValues[item.output_net] = getNet(item.details.input_net)* item.details.gain;
+                break;
+            case "Buffer":
+
+                netValues[item.output_net] = getNet(item.details.input_net);
+                break;
+            case "Scope":
+                
+                item.details.series.push(getNet(item.details.input_net))
+                item.details.time.push(time);
                 break;
                 
         }
     }
+
+//     case 1:
+                        
+//     let poly = document.getElementById("polyfunc").value.trim();
+    
+
+//     if (poly.length == 0)
+//         poly = 0;
+
+   
+//     var coeff= [];
+//     while (poly.indexOf(" ") != -1)
+//     {
+//         coeff[i] = parseInt(poly);
+//         poly = poly.slice(poly.indexOf(" "));    
+//         poly = poly.trimStart();   
+//         i++;
+//     }
+//     coeff[i] = parseInt(poly);
+//     coeff = coeff.reverse();
+//     const total = coeff.reduce((res, cur, i) => {
+//         res += cur * Math.pow(time,i);
+//         return res;
+//     }, 0);
+    
+//     return total;
+
+//     break;
+// case 2:
+//     return (parseFloat(document.getElementById("trig-mag").value)* Math.sin(parseFloat(document.getElementById("trig-freq").value)* 2 * Math.PI * (time - parseFloat(document.getElementById("trig-phase").value))) + parseFloat(document.getElementById("trig-dc").value));
+    
+//     break;
+
+// case 3:
+    
+//     if (Math.abs(parseFloat(document.getElementById("imp-time").value) - time) <= 0.0000001)
+//     {
+    
+//     return parseFloat(document.getElementById("imp-val").value);
+//     }
+//     else 
+//     return 0;
+
+//     break;
