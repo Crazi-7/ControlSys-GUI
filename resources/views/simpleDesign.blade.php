@@ -622,7 +622,7 @@
                     <button id="zoom-out-button" class="the-button"><i class="material-icons vcentre">remove</i></button>
                 </div>
             </div>
-            <div class="button-element simulate-button clickable">Simulate</div>
+            <div class="button-element simulate-button clickable" onclick="simulate()">Simulate</div>
         </div>
 
         <!-- SIDEBAR-->

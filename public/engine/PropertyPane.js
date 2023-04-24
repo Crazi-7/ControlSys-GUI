@@ -64,7 +64,7 @@ example.PropertyPane = Class.extend({
             //style
             $("#property_bg_color").val(figure.bgColor);
             $("#property_color").val(figure.color);
-            console.log(figure);
+            //console.log(figure);
        		isInUpdate=false;
        	});
     	
