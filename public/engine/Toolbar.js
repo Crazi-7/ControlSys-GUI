@@ -62,6 +62,7 @@ example.Toolbar = Class.extend({
 					var node = this.view.getPrimarySelection();
 					var command= new draw2d.command.CommandDelete(node);
 					this.view.getCommandStack().execute(command);
+					console.log("delloooooot");
 				},this)).button( "option", "disabled", true );
 	},
 

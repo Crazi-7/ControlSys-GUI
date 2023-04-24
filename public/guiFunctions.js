@@ -162,7 +162,8 @@ function addComponent(item)
             case "Adder":
                 details =
                 {
-                    input_nets: [1,1],
+                    inputs: 2,
+                    input_nets: [-1,-1],
                     input_signs: [1,1] 
                 };
                 break;
@@ -199,7 +200,8 @@ function addComponent(item)
                 {  
                     time: [],
                     series: [],
-                    inputs: 1,  
+                    inputs: 1, 
+                    input_net: -1,
                 };
                 break;
 
@@ -210,49 +212,97 @@ function addComponent(item)
                 type: item.currentTarget.childNodes[3].innerHTML,
                 name: item.currentTarget.childNodes[3].innerHTML,
                 id: rect.id,
-                output_net: "nothing",
+                output_net: -1,
                 details:details
             });
 
-           // console.log(simJson);
+           
+           
     }
 
 
     function simulate()
     {
-        //simJson
         simJson.nets = [];
-        console.log(app.view.figures);
-        console.log(app.view.lines);
         let linus = app.view.lines.data;
-        linus.forEach((value) => addWirings(value));
-         //adds wirings to simJson
+        linus.forEach((value) => addWirings(value));//adds wirings to simJson
+        adderBind("Adder");
+        adderBind("Transfer Function");
+        adderBind("Integrator");
+        adderBind("Scope");
+        console.log("sim:");
         console.log(simJson);
+        generate();
+
     }
     function addWirings(value)
     {
-
         let net = simJson.nets.find(net => net.input=== value.sourcePort.parent.id);
         if (net == undefined) //new net
         {
             net = 
             {
-                net_id: value.id,
+                net_id: [value.id],
                 input: value.sourcePort.parent.id,
                 outputs: [value.targetPort.parent.id]
             };
             simJson.nets.push(net);
             simJson.blocks.find(block => block.id == value.sourcePort.parent.id).output_net = value.id; //set current net as output net in corresponding block
-
         } else //output branch
         {
             net.outputs.push(value.targetPort.parent.id); //add another output port
+            net.net_id.push(value.id);
         }
-
-        //myArray.find(x => x.id === '45').foo;
-        //let neto = input.nets.find(net => net.net_id === current.output_net); //find the output net
     }
 
+
+    function adderBind(blockType) 
+    {
+        //the goal of this function is to bind the adder ports in connected order
+        let adders = simJson.blocks.filter(block => block.type == blockType);
+        let linus = app.view.lines.data;
+        
+        adders.forEach(function (adder) {
+                let filtered = linus.filter(linez => linez.targetPort.parent.id === adder.id); //all connected ports to said adder
+                let ports = app.view.figures.data.find(block => block.id == adder.id).inputPorts; // find the original blocks input ports
+                ports.data.forEach(function (port, index){       //check if the input ports are wired          
+                    let matched = filtered.filter(filter => filter.targetPort.id === port.id); //connection that belongs to the port
+                    if (matched.length > 0) //if there is a connection
+                    {
+                
+                        let netStuff = simJson.nets.find(net => net.net_id.includes(matched[0].id));
+                        //it contains here
+
+                       // console.log("ding"+ index);
+                        if (simJson.blocks.find(block => block.id == adder.id).type == "Adder")
+                            simJson.blocks.find(block => block.id == adder.id).details.input_nets[index] = netStuff.net_id[0];//add the source net to the adder
+                        else 
+                            simJson.blocks.find(block => block.id == adder.id).details.input_net = netStuff.net_id[0];//add the source net to non adders
+                    } else
+                    {
+                       // console.log("fail"+ index);
+                        if (simJson.blocks.find(block => block.id == adder.id).type == "Adder")
+                            simJson.blocks.find(block => block.id == adder.id).details.input_nets[index] = -1; //add a -1
+                    }
+                    
+                  //  console.log("adder:"+ adder.id);
+                  //  console.log("----------");
+                });       
+            
+        });
+        // net.outputs.forEach((value) => function(value) {
+        //     let targetBlock = simjson.blocks.find(block => block.id === value);
+        //     if (targetBlock.type == "Adder")
+        //     {
+        //         targetBlock.details.input_nets.push();
+        //     }
+
+        // });
+      
+    }
+    function testFunctiono(num) {
+        return num.id;
+      }
 
 
 
@@ -272,27 +322,26 @@ function addComponent(item)
 
 
     let history = []; //sequence of block ids indexed by order of checking
-    let netValues =[]; //values of net labels indexed by id
-    let input;
+    let netValues ={}; //values of net labels indexed by id
+    let input= simJson;
     let step;
     function generate()
     {
         history = [];
-        netValues =[];
-        input = JSON.parse(document.getElementById('json-input').value);
-        step = input.blocks.find(block => block.type === "input");
+        netValues = {};  
+        step = simJson.blocks.find(block => block.category === "sources");  //find the block where the type is input
         scanNet();
-        simulate();
+        simulationStart();
         console.log(history);
-        //makeBlock("input","function","f(x)");
+        
     }   
 
     function scanNet() 
     {
-        let current = step;
-        history.push(current.id);        
-        let neto = input.nets.find(net => net.net_id === current.output_net); //find the output net
-        let pnet = neto.net_id; //previous net
+        let current = step; //scan input
+        history.push(current.id);   //put input as first element     
+        let neto = input.nets.find(net => net.net_id.includes(current.output_net)); //find the output net 
+        let pnet = neto.net_id[0]; //previous net
         neto.outputs.forEach((value) => netBranchBlock(value, pnet)); //check next branch
     }
 
@@ -300,34 +349,41 @@ function addComponent(item)
     {
         let current;
         let proceed = true;
-        current = input.blocks.find(block => block.id === item);
+        current = input.blocks.find(block => block.id === item); //find current block
         if (history.includes(current.id))
-            proceed = false;
+            proceed = false; //if current block has already be evaluated stop
         else 
         {
-            if (current.type == "logic") //logic means there can be multiple inputs
+            if (current.type == "Adder") //logic means there can be multiple inputs
             {                
-                let branches = current.details.input_nets.slice();               
-                if (branches.indexOf(pnet) > -1)
-                    branches.splice(branches.indexOf(pnet), 1); //remove the branch u came from to prevent messing up the output                    
+                let branches = current.details.input_nets.slice();       //check all inputs for feedback        
+                if (branches.indexOf(pnet) > -1) 
+                    branches.splice(branches.indexOf(pnet), 1); //remove the branch u came from to prevent messing up the output  
+                    console.log("branches", branches);               
                 const result = branches.every((value) => checkFeedback(value, current.id, [])); //check if all branches are feedback or are satisfied
                 if (result)
-                    history.push(current.id);
+                    history.push(current.id); //add current block to history after confirming that all inputs have been evaluated
                 else
-                    proceed = false;           
-            } else if (current.type == "scope")
+                    proceed = false;   //kill the branch      
+            } else if (current.output_net == -1)
             {
-                history.push(current.id);
-                proceed = false;
-            } else
-            {
-                history.push(current.id);
+                history.push(current.id); 
+                proceed = false; //stop at the scope
             }
+             else
+            {
+                history.push(current.id); //add blocks
+            }
+            //an integrator would be best placed here
         }
             if (proceed)
             {
-                neto = input.nets.find(net => net.net_id === current.output_net); //find the output net
-                neto.outputs.forEach((value) => netBranchBlock(value, neto.net_id)); //scan all branches of the output net
+                neto = input.nets.find(net => net.net_id.includes(current.output_net)); //find the output net
+                console.log("neto");
+                console.log(neto);
+                console.log("current");
+                console.log(current);
+                neto.outputs.forEach((value) => netBranchBlock(value, neto.net_id[0])); //scan all branches of the output net
             }
     }
     
@@ -337,7 +393,8 @@ function addComponent(item)
         
         while (true)
             {
-                let netSearch = input.nets.find(net => net.net_id === item); 
+                let netSearch = input.nets.find(net => net.net_id.includes(item)); 
+                
                 let blockSearch = input.blocks.find(block => block.id === netSearch.input) 
                 if (history.includes(blockSearch.id)) 
                 {
@@ -345,7 +402,7 @@ function addComponent(item)
                     return checkSubset;
                 } //feed forward finish search (checks if the current block is evaluated somewhere before) also checks if the branch has been evaluated
                 searchBreakpoint.push(blockSearch.id)
-                if (blockSearch.type == "logic")
+                if (blockSearch.type == "Adder")
                 {
                     if (searchBreakpoint.includes(bid)) {return true;} //the program looped back (this path)
                     if (bid == blockSearch.id) {return true;} //feedback finish search
@@ -365,21 +422,24 @@ function addComponent(item)
     var results = [];
     var domain = [];
 
-    function simulateOLD() 
+    function simulationStart() 
     {
     results = [];
     domain = [];
         let time = 0;
         let stop = 10;
         let timeStep = 1/100.0;
+        
         while (time < stop)
         {
         history.forEach((value, index) => simulationRun(value, index, time, timeStep));
-        console.log("nets" + netValues)
+        console.log("nets");
+        console.log(netValues);
         time += timeStep;
         }
-        simulation = document.getElementById('simulation');
-            Plotly.newPlot( simulation, [{
+
+        simulationG = document.getElementById('simulation-graph');
+            Plotly.newPlot( simulationG, [{
             x: domain,
             y: results }], 
             {
@@ -425,6 +485,8 @@ function addComponent(item)
     {
         if (netValues[i] == undefined)
             netValues[i] = 0;
+        console.log("netRequested:"+ netValues[i]);
+        console.log("at:"+ i);
         return netValues[i];
     }
 
@@ -441,10 +503,10 @@ function addComponent(item)
         console.log("------ ");  
         console.log("item:"+ item.type);
         console.log("time: ", time); 
-        console.log("index: "+ index + " value: " + val); 
+        console.log("index: "+ index + " id: " + val); 
         switch(item.type)
         {
-            case "transfer":
+            case "Transfer Function":
 
                 let nums = item.details.transfer_function[0];
                 let dens = item.details.transfer_function[1];
@@ -478,50 +540,48 @@ function addComponent(item)
                         a[n-1][j] = -dens[j]; 
                     }
                 let u = getNet(item.details.input_net);
-                //console.log("u: ", u);  
+                console.log("u: ", u, "inputnet:", item.details.input_net);  
                 var amatrix = math.matrix(a);
                 if (item.details.xk.length === 0)
                 {
                     item.details.xk = math.zeros(n,1);
                     console.log("xk"+ item.details.xk);
                 }
-                var ax = math.multiply(amatrix,item.details.xk); // Axk    
-                
-                          
+                var ax = math.multiply(amatrix,item.details.xk); // Axk                 
                 var bu = math.multiply(bmatrix,u); //Buk
                 var axbu = math.add(ax,bu); // Axk + Bu            
                 var h = math.multiply(timestep,axbu); // h (Axk + Bu)
-
                 item.details.xk = math.add(item.details.xk,h); // xk+1
                 yk = math.multiply(cmatrix,item.details.xk); // yk
                 //console.log("output dest:", item.output_net);
                 //console.log("yk", yk.get([0, 0]));
                 netValues[item.output_net] = yk.get([0, 0]);
-
+                console.log("tf val:"+ netValues[item.output_net]);
+                console.log("to:"+ item.output_net)
                 break;
-            case "logic":
+            case "Adder":
 
                 let sum = 0;
                 console.log("length"+ item.details.input_nets.length);
                 for (let i=0;i<item.details.input_nets.length;i++)
                 {
-                    
-
                     sum += getNet(item.details.input_nets[i]) * item.details.input_signs[i];
                 }
                // console.log("output dest:", item.output_net);
                // console.log("sum:", sum);
                 netValues[item.output_net] = sum;
-
                 break;
-            case "input":
+            case "Step":
                 if (time >= 1)
                     netValues[item.output_net] = 1;
                 else
                     netValues[item.output_net] = 0;
+                console.log("stepped:"+ netValues[item.output_net]);
+                console.log("to:",item.output_net);
                 break;
-            case "scope":
-                //console.log("scopiee" + getNet(item.details.input_net))
+            case "Scope":
+
+                console.log("scopiee" + getNet(item.details.input_net))
                 results.push(getNet(item.details.input_net));
                 domain.push(time);
                 break;

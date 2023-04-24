@@ -5,14 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{URL('favicon.ico')}}">
+    <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
+    <script src="{{URL('math.js')}}" type="text/javascript"></script>
     <script src="{{URL('jquery.js')}}" type="text/javascript"></script>
     <script src="{{URL('jquery.browser.js')}}"></script>
     <script src="{{URL('jquery-ui.js')}}"></script>
     <script src="{{URL('jquery.layout.js')}}"></script>
-    
-   
     <script src="{{URL('draw2d.js')}}" type="text/javascript"></script>
-
     <script src="{{URL('engine/Application.js')}}"></script>
 	<script src="{{URL('engine/View.js')}}"></script>
 	<script src="{{URL('engine/Toolbar.js')}}"></script>
@@ -71,7 +70,17 @@
                 return c;
             }
         }));
+        app.view.on("figure:remove", function(emitter, event){ //make sure simulation matches view port on delete
+            if (event.figure.cssClass != "draw2d_Connection")
+                simJson.blocks.splice(simJson.blocks.indexOf(simJson.blocks.find(block => block.id == event.figure.id)), 1).concat(simJson.blocks.splice(simJson.blocks.indexOf(simJson.blocks.find(block => block.id == event.figure.id)), -1));
+        });
+
     });
+
+
+
+
+
     function toggleSideBar()
     {
         const sidebarEl = document.getElementsByClassName("sidebar")[0]; //find element 
@@ -511,6 +520,7 @@
             position: absolute;
             width:100%; 
             transition: transform 300ms ease-in-out;
+            overflow-y: scroll;
         }
         .property-category 
         {
@@ -768,11 +778,11 @@
                                         <div class="property-section"><div class="property-label">Color</div><div class="property-value"> <input id="property_color" type="text" class="form-control"/></div></div>
                                     </div>
                                 </div>
-
+    
                                 <div class="property-category">
-                                    <div class="property-category-heading">Debug</div>
+                                    <div class="property-category-heading">Graph</div>
                                     <div class="property-category-body">
-                                        <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                                        <div id="simulation-graph" style="width:500px;height:500px;"></div>
                                     </div>
                                 </div>
                         </div>
