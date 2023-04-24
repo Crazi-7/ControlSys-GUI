@@ -169,6 +169,7 @@ function addComponent(item)
                 details =
                 {
                     initial_value: 0,
+                    stored:0,
                     input_net: -1
                 };
                 break;
@@ -223,12 +224,12 @@ function addComponent(item)
     {
         simJson.nets = [];
         let linus = app.view.lines.data;
-        linus.forEach((value) => addWirings(value));//adds wirings to simJson
-        adderBind();
+        linus.forEach((value) => addWirings(value));//create the nets in simJson
+        adderBind(); //bind the blocks to those nets
         
         console.log("sim:");
         console.log(simJson);
-        generate();
+        generate(); //simulation
 
     }
     function addWirings(value)
@@ -263,6 +264,10 @@ function addComponent(item)
                 {
                     adder.details.time = [];
                     adder.details.series = [];
+                }
+                if (adder.type == "Integrator") //add initial value to prep for simulation
+                {
+                    adder.details.stored = adder.details.initial_value;
                 }
                 let filtered = linus.filter(linez => linez.targetPort.parent.id === adder.id); //all connected ports to said adder
                 let ports = app.view.figures.data.find(block => block.id == adder.id).inputPorts; // find the original blocks input ports
@@ -331,6 +336,7 @@ function addComponent(item)
         history = [];
         netValues = {};  
         step = simJson.blocks.find(block => block.category === "sources");  //find the block where the type is input
+        integrators = simJson.blocks.find(block => block.type === "Integrator");  //integration output
         scanNet();
         simulationStart();
         console.log(history);
@@ -570,19 +576,20 @@ function addComponent(item)
                 netValues[item.output_net] = total;
                 break;
             
-
-            case "Constant":
-                
-                    netValues[item.output_net] = item.details.input_details.value;
-              
+            case "Constant":                
+                netValues[item.output_net] = item.details.input_details.value;              
                 console.log("stepped:"+ netValues[item.output_net]);
                 console.log("to:",item.output_net);
+                break;
+            case "Integrator":                        
+                item.details.stored = (getNet(item.details.input_net)* timestep)+item.details.stored;
+
+                netValues[item.output_net] = item.details.stored;
                 break;
             case "Gain":
                 netValues[item.output_net] = getNet(item.details.input_net)* item.details.gain;
                 break;
             case "Buffer":
-
                 netValues[item.output_net] = getNet(item.details.input_net);
                 break;
             case "Scope":
