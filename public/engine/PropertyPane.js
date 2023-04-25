@@ -138,21 +138,32 @@ example.PropertyPane = Class.extend({
                     </div>
                     <div class="property-category input_step">
                         <div class="property-category-heading">Values</div>
-                    <div class="property-category-body">
+                    <div class="property-category-body vcentre">
                         <div class="property-section"><div class="property-label">Function</div><div class="property-value"> <input id="poly_function" type="text" class="form-control" /></div></div>
-                        <div class="property-section"><div class="property-label">Function</div><div class="property-value"> <div id="poly_function_ready" type="text" class="form-control" "/></div></div></div>
+                        <button class="clickable render-button">Click to render</button>
+                        <div class="property-section"><div class="property-label">Render</div><div class="property-value"> <div id="poly_function_ready" type="text" class="form-control"/></div></div></div>
                     </div>
                     </div>
                     `);
-                    $("#poly_function").val(targetBlock.details.input_details.function.reduce(
+                    let polyfunc = targetBlock.details.input_details.function.reduce(
                         (accumulator, currentValue) => accumulator +=  " "+currentValue
-                      ));
-                      $("#poly_function_ready").empty();
-                    render();
-                    //$("#poly_function_ready").val(targetBlock.details.input_details.function);
+                      );
+                    $("#poly_function").val(polyfunc);
+                      console.log("triggered");
+                      console.log($(".input_step input"));
+                      $(".input_step input").on("change", function(){
+                        // targetBlock.details.input_details.impulse_value = parseFloat($("#impulse_value").val());
+                        targetBlock.details.input_details.function = textToArray($("#poly_function").val());
+                        $("#poly_function_ready").empty();
+                        render("poly_function", "poly_function_ready"); //render text, destination id    
+                        figure.setUserData(userData={block:targetBlock});
+                       });
 
-                    
-                 
+                       $(".input_step button").on("click", function(){
+                        $("#poly_function_ready").empty();
+                        render("poly_function", "poly_function_ready"); //render id, destination id
+                       });
+      
                     break;
                 case "Trig":
                 
@@ -231,8 +242,14 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                         <div class="property-category-heading">Inputs</div>
                     <div class="property-category-body">
-                        <!-- add here ->
-                        <div class="property-section"><div class="property-label">Frequency</div><div class="property-value"> <input id="adder_signs" type="text" class="form-control"/></div></div>
+                    <div class="property-section"><div class="property-label">Number of Inputs</div><div class="property-value radio-div">
+                        <div class="button r" id="button-1">
+                            <input type="checkbox" class="checkbox">
+                            <div class="knobs"></div>
+                            <div class="layer"></div>
+                        </div>
+                    </div></div>
+                        
                     </div>
                     </div>
                     `);
@@ -268,12 +285,6 @@ example.PropertyPane = Class.extend({
                  
                     break;
                 case "Transfer Function":
-                    // details =
-                    // {  
-                    //     transfer_function: [[1],[1,1]],
-                    //     input_net: -1,
-                    //     xk: []    
-                    // };
                     $("#simulation_page").empty().append(`
                     <div class="property-category">
                     <div class="property-category-heading">Input</div>
@@ -289,15 +300,16 @@ example.PropertyPane = Class.extend({
                         <div class="property-section"><div class="property-label">Denominator</div><div class="property-value"> <input id="den_function" type="text" class="form-control"/></div></div>
                     </div>
                     </div>
-
-                    <div class="property-category input_step">
+                   <div class="vcentre rendoor"> <button class="clickable render-button">Click to render</button> </div>
+                    <div class="property-category input_step" style="margin-bottom:200px;">
                         <div class="property-category-heading">Rendered</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Numerator</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Numerator</div><div class="property-value"> <div id="num_function_ready" class="form-control"/></div></div>
                         <hr>
-                        <div class="property-section"><div class="property-label">Denominator</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Denominator</div><div class="property-value"> <div id="den_function_ready" class="form-control"/></div></div>
                     </div>
                     </div>
+                  
                     `);
 
                     $("#num_function").val(targetBlock.details.transfer_function[0].reduce(
@@ -307,12 +319,27 @@ example.PropertyPane = Class.extend({
                         (accumulator, currentValue) => accumulator +=  " "+currentValue
                     ));
 
-                    $(".input_step input").on("change", function(){
-                        // targetBlock.details.gain = parseFloat($("#gain_value").val());
+                    
+                      $(".input_step input").on("change", function(){
+                        // targetBlock.details.input_details.impulse_value = parseFloat($("#impulse_value").val());
+                        targetBlock.details.transfer_function[0] = textToArray($("#num_function").val());
+                        targetBlock.details.transfer_function[1] = textToArray($("#den_function").val());
+                        $("#num_function_ready").empty();
+                        render("num_function", "num_function_ready"); //render text, destination id    
+                        setTimeout(function(){}, 50); 
+                        $("#den_function_ready").empty();
+                        render("den_function", "den_function_ready"); //render text, destination id   
                         figure.setUserData(userData={block:targetBlock});
-                    });
-                      $("#poly_function_ready").empty();
-                    render();
+                       });
+
+                       $(".rendoor button").on("click", function(){
+                        $("#num_function_ready").empty();
+                        render("num_function", "num_function_ready"); //render text, destination id 
+                        setTimeout(function(){}, 50);   
+                        $("#den_function_ready").empty();
+                        render("den_function", "den_function_ready"); //render text, destination id   
+                       });
+      
 
                     break;
                 case "Gain":
@@ -455,9 +482,31 @@ function rgbToHex(r, g, b) {
     } : null;
   }
 
-  function render() {
+function textToArray(numId)
+{
+    var num = numId.trim();
+    var i = 0;
+
+    if (num.length == 0)
+        num = "1";
+    var numval= [];
+    while (num.indexOf(" ") != -1)
+    {
+        numval[i] = parseInt(num);
+        num = num.slice(num.indexOf(" "));    
+        num = num.trimStart();   
+        i++;
+    }
+    numval[i] = parseInt(num);
  
-    var num = document.getElementById("poly_function").value.trim();
+    numval = numval.reverse();
+    
+    nums = [... numval];
+    return nums;
+}
+
+  function render(numId, outputId) {
+    var num = document.getElementById(numId).value.trim();
     var i = 0;
 
     if (num.length == 0)
@@ -508,7 +557,7 @@ function rgbToHex(r, g, b) {
         input += numval[j];
     }
 
-    output = document.getElementById("poly_function_ready");
+    output = document.getElementById(outputId);
     output.innerHTML = '';
     console.log(output);
 

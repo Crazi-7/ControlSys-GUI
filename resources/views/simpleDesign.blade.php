@@ -527,7 +527,7 @@
             position: absolute;
             width:100%; 
             transition: transform 300ms ease-in-out;
-            overflow-y: scroll;
+            overflow-x: scroll;
         }
         .property-category 
         {
@@ -685,10 +685,10 @@
 {
     content: '+';
     position: absolute;
-    top: 4px;
+    top: 6px;
     left: 4px;
     width: 20px;
-    height: 10px;
+    height: 15px;
     color: #fff;
     font-size: 10px;
     font-weight: bold;
@@ -710,12 +710,25 @@
 #button-1 .checkbox:checked ~ .layer
 {
     background-color: inherit;
-    filter: brightness(1.2);
+
 }
 
 #button-1 .knobs, #button-1 .knobs:before, #button-1 .layer
 {
     transition: 0.3s ease all;
+}
+div>.radio-div>*
+{
+    width:55px;
+}
+.radio-div
+{
+    width:74px;
+}
+div>.radio-div
+{
+    background-color: inherit;
+    filter: brightness(1);
 }
 .sim-settings
 {
@@ -766,7 +779,16 @@ hr
     filter:brightness(1.2);
     width:280px;
     margin-left: 185px;
-   
+}
+.render-button 
+{
+    filter:brightness(1.4);
+    background-color: #4b535f;
+    width: 250px;
+    height:40px;
+    margin: 20px 0;
+    border-radius: 15px;
+    font-weight: bold;
 }
 
     </style>
@@ -942,11 +964,6 @@ hr
                                         <div class="property-section"><div class="property-label">id</div><div class="property-value"> <input id="property_id" type="text" class="form-control"/></div></div>
                                         <div class="property-section radio-section"><div class="property-label">id</div>
                                             
-                                                <div class="button r" id="button-1">
-                                                    <input type="checkbox" class="checkbox">
-                                                    <div class="knobs"></div>
-                                                    <div class="layer"></div>
-                                                </div>
                                             
                                         </div>
                                     
