@@ -186,7 +186,7 @@
             width: 60px;
             background-color: #5b5b5b;
             position: fixed;
-            top: 150px;
+            top: 135px;
             left: 20px;   
             border-radius: 10px;       
             display: flex;
@@ -198,7 +198,7 @@
         {
             font-size: 50px;
         }
-        .toolbar>.tool>i 
+        .toolbar>.tool>i, .tool>span>i
         {
             font-size: 50px;
             width: 100%;
@@ -534,7 +534,7 @@
            /* background-color:#575757;*/
             background-color: inherit;
             filter: brightness(1.1);
-            width:100%;
+            width:84%;
             padding:10px;
             border-radius: 10px;
         }
@@ -717,6 +717,57 @@
 {
     transition: 0.3s ease all;
 }
+.sim-settings
+{
+    position: fixed;
+    bottom:40px;
+    left:20px;
+    background-color: #5b5b5b;
+    padding:15px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+
+    display: flex;
+    flex-flow: column nowrap;
+    
+    row-gap: 10px;
+}
+.sim-element 
+{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    height:35px;
+}
+.sim-element > p 
+{
+    display: block;
+    width: 200px;
+}
+.sim-element > input 
+{
+    display: block;
+    background-color: #656565;
+    color:#b1b1b1;
+    width:50px;
+    border-radius: 10px;
+    border:none;
+    height:30px;
+    text-align: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+hr 
+{
+    border:none;
+    border-top: 4px solid #4f545b;
+    filter:brightness(1.2);
+    width:280px;
+    margin-left: 185px;
+   
+}
 
     </style>
 </head>
@@ -725,7 +776,6 @@
         <!-- SUBHEADER-->
         <div class="subheader">
         <div class="subheader-element clickable"><a href="{{route('home')}}">Home</a></div>
-            <div class="subheader-element clickable"><p>File</p></div>
             <div class="subheader-element clickable"><p>Save</p></div>
             <div class="subheader-element clickable" id="undo-button"><i class="material-symbols-outlined vcentre">undo</i></div>
             <div class="subheader-element clickable" id="redo-button"><i class="material-symbols-outlined vcentre">redo</i></div>
@@ -737,10 +787,13 @@
         <div class="tool clickable" id="hand-pan"><i class="material-icons vcentre">back_hand</i></div>
         <div class="tool clickable" id="edit-bar-button"><i class="material-icons vcentre">edit</i></div>
         <div class="tool clickable" id="show"><i class=" material-icons vcentre">add_box</i></div>
-        <div class="tool clickable lt"><i class="last-tool material-icons vcentre" id="last-tool">brush</i></div>
+        <div class="tool clickable lt" id="delete-button"><i class="last-tool material-icons vcentre" id="last-tool">delete</i></div>
         
         </div>
-
+        <div class="sim-settings">
+        <div class="sim-element"><p>Simulation time:</p><input id="simulation_time" value="10">(s)</div>
+        <div class="sim-element"><p>Simulation frequency:</p><input id="simulation_frequency" value="100">(Hz)</div>
+        </div>
         <!-- OVERLAY BUTTONS-->
         <div class="buttons">
             <div class="button-element zoom-buttons">

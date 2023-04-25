@@ -68,13 +68,15 @@ example.PropertyPane = Class.extend({
            
        		isInUpdate=false;
 
-            let targetBlock = simJson.blocks.find(block => block.id === figure.id);
-
+            let targetBlock = simJson.blocks.find(block => block.id === figure.id); 
+            if (targetBlock == undefined) //undo and redo messes up these values with delete
+            {
+                targetBlock = figure.getUserData().block;
+                simJson.blocks.push(targetBlock);
+            }
             switch(targetBlock.type)
             {
                 case "Step":
-                   
-
                     $("#simulation_page").empty().append(`
                     <div class="property-category">
                     <div class="property-category-heading">Input</div>
@@ -82,7 +84,7 @@ example.PropertyPane = Class.extend({
                         <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Step" class="form-control"/></div></div>
                     </div>
                     </div>
-                    <div class="property-category">
+                    <div class="property-category input_step">
                         <div class="property-category-heading">Values</div>
                     <div class="property-category-body">
                         <div class="property-section"><div class="property-label">Step Value</div><div class="property-value"> <input id="step_value" type="text" class="form-control"/></div></div>
@@ -92,12 +94,18 @@ example.PropertyPane = Class.extend({
                     `);
                     $("#step_value").val(targetBlock.details.input_details.step_value);
                     $("#step_time").val(targetBlock.details.input_details.step_time);
+                    
+                    $(".input_step input").on("change", function(){
+                        targetBlock.details.input_details.step_value = parseFloat($("#step_value").val());
+                        targetBlock.details.input_details.step_time = parseFloat($("#step_time").val());
+                        figure.setUserData(userData={block:targetBlock});
+                       });
                  
                     break;
                 case "Impulse":
                     
                     $("#simulation_page").empty().append(`
-                    <div class="property-category input_step">
+                    <div class="property-category">
                     <div class="property-category-heading">Input</div>
                     <div class="property-category-body">
                         <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Impulse" class="form-control"/></div></div>
@@ -113,7 +121,11 @@ example.PropertyPane = Class.extend({
                     `);
                     $("#impulse_value").val(targetBlock.details.input_details.impulse_value);
                     $("#impulse_time").val(targetBlock.details.input_details.impulse_time);
-                 
+                    $(".input_step input").on("change", function(){
+                        targetBlock.details.input_details.impulse_value = parseFloat($("#impulse_value").val());
+                        targetBlock.details.input_details.impulse_time = parseFloat($("#impulse_time").val());
+                        figure.setUserData(userData={block:targetBlock});
+                       });
                     break;
                 case "Polynomial":
                                    
@@ -124,7 +136,7 @@ example.PropertyPane = Class.extend({
                         <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Polynomial" disabled="disabled" class="form-control"/></div></div>
                     </div>
                     </div>
-                    <div class="property-category">
+                    <div class="property-category input_step">
                         <div class="property-category-heading">Values</div>
                     <div class="property-category-body">
                         <div class="property-section"><div class="property-label">Function</div><div class="property-value"> <input id="poly_function" type="text" class="form-control" /></div></div>
@@ -165,6 +177,13 @@ example.PropertyPane = Class.extend({
                     $("#input_frequency").val(targetBlock.details.input_details.frequency);
                     $("#input_phase").val(targetBlock.details.input_details.phase);
                     $("#input_dc").val(targetBlock.details.input_details.dc);
+                    $(".input_step input").on("change", function(){
+                        targetBlock.details.input_details.amplitude = parseFloat($("#input_amplitude").val());
+                        targetBlock.details.input_details.frequency = parseFloat($("#input_frequency").val());
+                        targetBlock.details.input_details.phase = parseFloat($("#input_phase").val());
+                        targetBlock.details.input_details.dc = parseFloat($("#input_dc").val());
+                        figure.setUserData(userData={block:targetBlock});
+                       });
                     break;
                 case "Constant":          
                     $("#simulation_page").empty().append(`
@@ -183,7 +202,10 @@ example.PropertyPane = Class.extend({
                     </div>
                     `);
                     $("#constant_value").val(targetBlock.details.input_details.value);
-                    
+                    $(".input_step input").on("change", function(){
+                        targetBlock.details.input_details.value = parseFloat($("#constant_value").val());
+                        figure.setUserData(userData={block:targetBlock});
+                       });
                  
                     break;
                 case "Adder":
@@ -204,6 +226,12 @@ example.PropertyPane = Class.extend({
                         <div class="property-category-heading">Values</div>
                     <div class="property-category-body">
                         <div class="property-section"><div class="property-label">Number of Inputs</div><div class="property-value"> <input id="adder_inputs" type="text" class="form-control"/></div></div>
+                    </div>
+                    </div>
+                    <div class="property-category input_step">
+                        <div class="property-category-heading">Inputs</div>
+                    <div class="property-category-body">
+                        <!-- add here ->
                         <div class="property-section"><div class="property-label">Frequency</div><div class="property-value"> <input id="adder_signs" type="text" class="form-control"/></div></div>
                     </div>
                     </div>
@@ -233,15 +261,59 @@ example.PropertyPane = Class.extend({
                     `);
                     $("#initial_value").val(targetBlock.details.initial_value);
                     
+                    $(".input_step input").on("change", function(){
+                        targetBlock.details.initial_value = parseFloat($("#initial_value").val());
+                        figure.setUserData(userData={block:targetBlock});
+                       });
                  
                     break;
                 case "Transfer Function":
-                    details =
-                    {  
-                        transfer_function: [[1],[1,1]],
-                        input_net: -1,
-                        xk: []    
-                    };
+                    // details =
+                    // {  
+                    //     transfer_function: [[1],[1,1]],
+                    //     input_net: -1,
+                    //     xk: []    
+                    // };
+                    $("#simulation_page").empty().append(`
+                    <div class="property-category">
+                    <div class="property-category-heading">Input</div>
+                    <div class="property-category-body">
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Step" class="form-control"/></div></div>
+                    </div>
+                    </div>
+                    <div class="property-category input_step">
+                        <div class="property-category-heading">Values</div>
+                    <div class="property-category-body">
+                        <div class="property-section"><div class="property-label">Numerator</div><div class="property-value"> <input id="num_function" type="text" class="form-control"/></div></div>
+                        <hr>
+                        <div class="property-section"><div class="property-label">Denominator</div><div class="property-value"> <input id="den_function" type="text" class="form-control"/></div></div>
+                    </div>
+                    </div>
+
+                    <div class="property-category input_step">
+                        <div class="property-category-heading">Rendered</div>
+                    <div class="property-category-body">
+                        <div class="property-section"><div class="property-label">Numerator</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                        <hr>
+                        <div class="property-section"><div class="property-label">Denominator</div><div class="property-value"> <input id="" type="text" class="form-control"/></div></div>
+                    </div>
+                    </div>
+                    `);
+
+                    $("#num_function").val(targetBlock.details.transfer_function[0].reduce(
+                        (accumulator, currentValue) => accumulator +=  " "+currentValue
+                    ));
+                    $("#den_function").val(targetBlock.details.transfer_function[1].reduce(
+                        (accumulator, currentValue) => accumulator +=  " "+currentValue
+                    ));
+
+                    $(".input_step input").on("change", function(){
+                        // targetBlock.details.gain = parseFloat($("#gain_value").val());
+                        figure.setUserData(userData={block:targetBlock});
+                    });
+                      $("#poly_function_ready").empty();
+                    render();
+
                     break;
                 case "Gain":
                   
@@ -261,8 +333,10 @@ example.PropertyPane = Class.extend({
                     </div>
                     `);
                     $("#gain_value").val(targetBlock.details.gain);
-                    
-                 
+                    $(".input_step input").on("change", function(){
+                        targetBlock.details.gain = parseFloat($("#gain_value").val());
+                        figure.setUserData(userData={block:targetBlock});
+                       });
                     break;
                 case "Buffer":
                     $("#simulation_page").empty().append(`
@@ -272,19 +346,10 @@ example.PropertyPane = Class.extend({
                         <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Buffer" class="form-control"/></div></div>
                     </div>
                     </div>
-                   
-                    `);
-                 
+                    `);  
                     
                     break;
                 case "Scope":
-                    // details =
-                    // {  
-                    //     time: [],
-                    //     series: [],
-                    //     inputs: 1, 
-                    //     input_net: -1,
-                    // };
                     $("#simulation_page").empty().append(`
                     <div class="property-category input_step">
                     <div class="property-category-heading">Output</div>
@@ -294,12 +359,12 @@ example.PropertyPane = Class.extend({
                     </div>
                     <div class="property-category input_step">
                         <div class="property-category-heading">Values</div>
-                    <div class="property-category-body">
-                    <div id="simulation-graph" style="width:500px;height:500px;"></div>
+                    <div class="property-category-body vcentre">
+                    <div id="simulation-graph" style="width:400px;height:300px;margin:0;filter: brightness(1.25);border-radius:10px;"></div>
                     
                     </div>
                     </div>
-                    <div style="height:200px"> </div>
+                    <div style="height:400px"> </div>
                     
                     `);
                    // $("#gain_value").val(targetBlock.details.gain);
@@ -318,8 +383,8 @@ example.PropertyPane = Class.extend({
                            } ,
                            color: "lightgrey",
                        margin: { t: 50 },
-                       plot_bgcolor: "#555",
-                       paper_bgcolor: "#555555",
+                       plot_bgcolor: "#4f545b",
+                       paper_bgcolor: "#4f545b",
                        xaxis: {
                            title: 'Time (s)',
                            color: 'lightgrey',
@@ -358,7 +423,7 @@ example.PropertyPane = Class.extend({
     	    cmd.setPosition(parseInt($("#property_position_x").val()),parseInt($("#property_position_y").val()));
     	    figure.getCanvas().getCommandStack().execute(cmd);
     	});
-
+       
         $("#color_panel input").on("change", function(){
     	    // with undo/redo support  
             let colors = hexToRgb($("#property_bg_color").val());  
@@ -368,7 +433,8 @@ example.PropertyPane = Class.extend({
             cmd = new draw2d.command.CommandAttr(figure, {color:{red:colors.r,green:colors.g,blue:colors.b,alpha:1}}); 
     	    figure.getCanvas().getCommandStack().execute(cmd);
     	});
-    	
+       
+
 
 	}
 });

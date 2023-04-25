@@ -205,20 +205,25 @@ function addComponent(item)
                 break;
 
         }
-        simJson.blocks.push(
-            {
-                category: item.currentTarget.childNodes[3].className.substr(25),
-                type: item.currentTarget.childNodes[3].innerHTML,
-                name: item.currentTarget.childNodes[3].innerHTML,
-                id: rect.id,
-                output_net: -1,
-                details:details
-            });
-
-           
-           
+        let block = {
+            category: item.currentTarget.childNodes[3].className.substr(25),
+            type: item.currentTarget.childNodes[3].innerHTML,
+            name: item.currentTarget.childNodes[3].innerHTML,
+            id: rect.id,
+            output_net: -1,
+            details:details
+        };
+        simJson.blocks.push(block);
+        rect.setUserData(userData={block:block});
     }
 
+
+    
+    //=============================================
+    //
+    // Simulation Prep
+    //
+    //==============================================
 
     function simulate()
     {
@@ -311,16 +316,9 @@ function addComponent(item)
       }
 
 
-
-
-
-
-
-
-
     //=============================================
     //
-    // OLD SIMULATION
+    // Engine
     //
     //==============================================
 
@@ -335,14 +333,30 @@ function addComponent(item)
     {
         history = [];
         netValues = {};  
-        step = simJson.blocks.find(block => block.category === "sources");  //find the block where the type is input
-        integrators = simJson.blocks.find(block => block.type === "Integrator");  //integration output
-        scanNet();
+        step = simJson.blocks.filter(block => block.category === "sources");  //find the block where the type is input
+        integrators = simJson.blocks.filter(block => block.type === "Integrator");  //integration output
+
+        console.log(integrators);
+        integrators.forEach((value) => inputBranch(value));
+        console.log("source", step);
+        step.forEach((value) => inputBranch(value)); //calculate
+        //scanNet();
         simulationStart();
         console.log(history);
         
     }   
 
+    function inputBranch(value) 
+    {
+        let current = value; //scan input
+        history.push(current.id);   //put input as first element     
+        let neto = input.nets.find(net => net.net_id.includes(current.output_net)); //find the output net 
+        if (neto != undefined)
+        {
+            let pnet = neto.net_id[0]; //id of net
+            neto.outputs.forEach((value) => netBranchBlock(value, pnet)); //check next branch
+        }
+    }
     function scanNet() 
     {
         let current = step; //scan input
@@ -376,21 +390,28 @@ function addComponent(item)
             {
                 history.push(current.id); 
                 proceed = false; //stop at the scope
+            } else if (current.type == "Integrator")
+            {
+                proceed = false;                
             }
              else
             {
                 history.push(current.id); //add blocks
             }
-            //an integrator would be best placed here
+           
         }
             if (proceed)
             {
                 neto = input.nets.find(net => net.net_id.includes(current.output_net)); //find the output net
+                if (neto != undefined)
+                {
+                    neto.outputs.forEach((value) => netBranchBlock(value, neto.net_id[0])); //scan all branches of the output net
+                }
                 console.log("neto");
                 console.log(neto);
                 console.log("current");
                 console.log(current);
-                neto.outputs.forEach((value) => netBranchBlock(value, neto.net_id[0])); //scan all branches of the output net
+                
             }
     }
     
@@ -401,7 +422,12 @@ function addComponent(item)
         while (true)
             {
                 let netSearch = input.nets.find(net => net.net_id.includes(item)); 
-                
+                console.log("item: ", item);                
+                console.log("netsearch: ", netSearch);
+                if (netSearch == undefined)
+                {
+                    return true;
+                }
                 let blockSearch = input.blocks.find(block => block.id === netSearch.input) 
                 if (history.includes(blockSearch.id)) 
                 {
@@ -415,16 +441,17 @@ function addComponent(item)
                     if (bid == blockSearch.id) {return true;} //feedback finish search
                     const result = blockSearch.details.input_nets.every((value) => checkFeedback(value, bid, searchBreakpoint)); //check if all branches are feedback or are satisfied
                     return result;
-                } else 
+                } else if (blockSearch.category == "sources" || blockSearch.type == "Integrator")
+                {
+                    return false; //stop the branch and kill it
+                }
+                else 
                 {
                     item = blockSearch.details.input_net;
                 }                
             }
             //keep searching through history to find the input if its recursive
     }
-
-
-
 
     var results = [];
     var domain = [];
@@ -434,8 +461,9 @@ function addComponent(item)
     results = [];
     domain = [];
         let time = 0;
-        let stop = 10;
-        let timeStep = 1/100.0;
+        let stop = parseFloat(document.getElementById("simulation_time").value);
+        let freq = parseFloat(document.getElementById("simulation_frequency").value);
+        let timeStep = 1/freq;
         
         while (time < stop)
         {
@@ -446,8 +474,7 @@ function addComponent(item)
         }
 
     }
-    
-    
+       
 
     function getNet(i)
     {
@@ -457,12 +484,6 @@ function addComponent(item)
         console.log("at:"+ i);
         return netValues[i];
     }
-
-
-    
-
-
-
 
 
     function simulationRun(val, index, time, timestep)
@@ -558,12 +579,7 @@ function addComponent(item)
                 break;
 
             case "Trig":
-                
-                //    netValues[item.output_net] = item.details.input_details.step_value;
-                
                 netValues[item.output_net] = (item.details.input_details.amplitude* Math.sin(item.details.input_details.frequency* 2 * Math.PI * (time - item.details.input_details.phase)) + item.details.input_details.dc);
-                console.log("stepped:"+ netValues[item.output_net]);
-                console.log("to:",item.output_net);
                 break;
 
             case "Polynomial":
@@ -574,16 +590,12 @@ function addComponent(item)
                     return res;
                 }, 0);
                 netValues[item.output_net] = total;
-                break;
-            
+                break;            
             case "Constant":                
-                netValues[item.output_net] = item.details.input_details.value;              
-                console.log("stepped:"+ netValues[item.output_net]);
-                console.log("to:",item.output_net);
+                netValues[item.output_net] = item.details.input_details.value;           
                 break;
             case "Integrator":                        
                 item.details.stored = (getNet(item.details.input_net)* timestep)+item.details.stored;
-
                 netValues[item.output_net] = item.details.stored;
                 break;
             case "Gain":
