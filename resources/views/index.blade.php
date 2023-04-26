@@ -61,7 +61,7 @@ window.addEventListener("scroll", reveal);
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
-            filter: brightness(0.5);
+            filter: brightness(0.7);
             display: flex;
             flex-direction: column;
             flex-wrap: nowrap;
@@ -131,7 +131,7 @@ window.addEventListener("scroll", reveal);
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
-            filter: brightness(0.6);
+            filter: brightness(0.8);
         }
         #third-part 
         {
