@@ -396,6 +396,8 @@ function addComponent(item)
             }
              else
             {
+                if (current.type == "Transfer Function")
+                    current.details.xk = [];
                 history.push(current.id); //add blocks
             }
            
@@ -583,12 +585,13 @@ function addComponent(item)
                 break;
 
             case "Polynomial":
-                let coeff = item.details.input_details.function;
+                let coeff = [... item.details.input_details.function];
                 coeff = coeff.reverse();
                 const total = coeff.reduce((res, cur, i) => {
                     res += cur * Math.pow(time,i);
                     return res;
                 }, 0);
+                console.log("total", total);
                 netValues[item.output_net] = total;
                 break;            
             case "Constant":                

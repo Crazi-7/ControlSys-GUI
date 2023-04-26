@@ -13,11 +13,12 @@
             padding: 0px;
             box-sizing: border-box;
             text-align: center;
+            font-family: Arial, sans-serif;
         }
         body 
         {
             margin: 0px;
-            padding: 10vh 0px;
+            padding: 5vh 0px;
             box-sizing: border-box; 
             display: flex;
             align-items: center;
@@ -25,8 +26,9 @@
             justify-content: space-between;
             row-gap: 10vh;
             color: white;
-            background: rgb(204,104,104);
-            background-image: linear-gradient(146deg, rgba(147,104,204,1) 0%, rgba(205,103,177,1) 100%);
+            background-color: #414141;
+            /* background: rgb(204,104,104);
+            background-image: linear-gradient(146deg, rgba(147,104,204,1) 0%, rgba(205,103,177,1) 100%); */
         }
         .container 
         {
@@ -38,6 +40,11 @@
         {
             font-size: 72px;
             margin: 2vh 0;
+            background-color: #8b6196;
+            color: #d9d9d9;
+            border-radius: 20px;
+            padding: 20px;
+            width: 400px;
         }
         hr 
         {
@@ -46,12 +53,20 @@
             margin-bottom: 5vh;
             
         }
-        fieldset
+        fieldset,.set2, .alert-fail
         {
             width: 80vw;
-            background: linear-gradient(69deg, rgba(204,104,104,1) 0%, rgba(205,152,103,1) 70%);
-            border-width: 1vh;
-            border-style: solid;
+            background-color: #5b5b5b;
+           
+            border-radius: 15px;
+            border:none;
+            color: #d9d9d9;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content:flex-start;
+            row-gap: 0;
+
             
         }
         input 
@@ -60,39 +75,107 @@
             width: 20vw;
             font-size: 35px;
             margin: 2vh 0;
-            background-color: #f8d5c9;
+            color: #d9d9d9;
             border-style: none;
             text-align: center;
-            filter: opacity(50%);
+            
+        }
+        .input-section>input
+        {
+            height: 10vh;
+            width: 20vw;
+            font-size: 35px;
+            margin: 2vh 0;
+            filter:brightness(1.1);
+            border-style: none;
+            text-align: center;
+            background-color: #5b5b5b !important;
+            -webkit-text-fill-color: gray !important;
             margin-bottom: 3vh;
             border-radius: 20px;
         }
         input[type="text"]
         {
-
+            background-color: #5b5b5b !important;
+        }
+        input:autofill, input:-webkit-autofill {
+            background-color: #5b5b5b !important;
         }
         input[type="password"]
         {
-
+            
         }
         input[type="submit"]
         {
             border-radius: 30px;
             width: 15vw;
+            background-color: #619661;
+            filter:brightness(1.2);
+            color: #d9d9d9;
         }
-        input[type="submit"]:hover 
+        .clickable:hover 
         {
              filter: brightness(0.6);
              cursor: pointer;
+             background-image: linear-gradient(rgb(0 0 0/40%) 0 0);
+             
         }
-        .alert-fail
+    
+        .input-section {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content:flex-start;
+            margin: 20px 0;
+           
+        }
+        .input-section>label {
+            width:300px;
+            text-align: left;
+            display:block;
+        }
+        .input-section>input {
+            width:600px;
+            display:block;
+        }
+        .input-container
         {
-            width: 80vw;
-            height: 10vh;
-            background: linear-gradient(69deg, rgba(204,104,104,1) 0%, rgba(205,152,103,1) 70%);
-            border-width: 0.5vh;
-            border-style: solid;
-            margin 0;
+            margin: 30px 10px;
+        
+        }
+        .set2 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content:flex-start;
+            row-gap: 30px;
+            padding:20px;
+        }
+        .set-elem 
+        {
+            font-size: 48px;
+           border-radius: 15px;
+            background-color: #4e819c;
+            width:500px;
+            height:90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content:center;
+            margin: 10px 0;
+
+        }
+        a {
+            text-decoration: none;
+            color: #d9d9d9;
+        }
+        #last 
+        {
+            margin-bottom: 30px;
+        }
+        .alert-fail 
+        {
+            height: 100px;
         }
     </style>
 </head>
@@ -100,9 +183,7 @@
 @if(session('error'))
                 <div class="alert alert-fail alert-dismissible fade show container" role="alert">
                     {{session('error')}}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    
                 </div>
 @endif
 
@@ -112,19 +193,28 @@
            <fieldset>  
 
                 <h1>Login </h1>  
-                <hr>
+                <div class="input-container">
+                    <div class="input-section">
+                        <label for="Username">Username</label> 
+                        <input type="text" name="username" placeholder="User" min="4"> 
+                    </div>
+                    
+                    <div class="input-section">
+                        <label for="Password">Password</label> 
+                        <input type="password" name="password" placeholder="**********" min="6"> 
+                    </div>
+                </div>
 
-                <label for="Username">Username</label> <br>
-                <input type="text" name="username" placeholder="User" min="4"> <br>
-                
-                <label for="Password">Password</label> <br>
-                <input type="password" name="password" placeholder="**********" min="6"> <br>
-
-                <input type="submit" value="login">
+                <input type="submit" value="Login" class="clickable">
            </fieldset>
        </form>
-       <p>Don't have an account? <a href="{{route('register')}}">Register</a></p>
-       <p> <a href="{{route('index')}}">Go back</a></p>
+       </div>
+       <div class="set2" >
+       <h1 class="set-heading" style="width:700px;">Don't have an account?</h1>
+       <div class="set-elem clickable" ><a href="{{route('register')}}">Register</a></div>
+       <div class="set-elem clickable" ><a href="{{route('simple')}}">Continue as guest</a></div> 
+       <div class="set-elem clickable" id="last" > <a href="{{route('index')}}">Go back</a></div>
+        
    </div> 
 </body>
 </html>

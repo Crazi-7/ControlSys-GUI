@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{URL('favicon.ico')}}">
+    
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
@@ -33,6 +34,8 @@
             margin: 0px;
             padding: 0px;
             box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
             
         }
         body 
@@ -62,7 +65,7 @@
             justify-content: space-between;
             column-gap: 40vw;
             align-items: center;
-            width: 100vw;
+            width: 100%;
         }
         ul 
         {
@@ -70,8 +73,12 @@
             margin: 0;
             padding: 0;
             background-color: #333;
-            width: 100vw;
+            width: 100%;
             
+        }
+        header
+        {
+            width:100%;
         }
         .header-list-elements
         {
@@ -178,7 +185,7 @@
 
         .transfer-output {
             background-color: #997dbd;
-            width:300px;
+            width:400px;
             height:125px;
             display:flex;
             font-size: 30px;
@@ -195,7 +202,7 @@
         #controller-button
         {
             width: 15vw;
-            height: 5vh;
+            height: 7vh;
             background-color: #7aafe4;
             color:#ddd;
             font-size: 20px;
@@ -212,10 +219,20 @@
             background-color: #555;
             color: #bbb;
         }
+        input[type="text"],#input-type 
+        {
+            border-radius: 15px;
+            border:none;
+            height:40px;
+            padding:5px;
+            text-align: center;
+            font-size: 25px;
+
+        }
         #simulator-button 
         {
             width: 10vw;
-            height: 5vh;
+            height: 7vh;
             background-color: #77c067;
             color:#ddd;
             font-size: 20px;
@@ -234,7 +251,80 @@
             filter: brightness(0.6);
             cursor: pointer;
         }
-     
+        #input-type 
+        {
+            background-color: #555;
+            color: #bbb;
+            
+        }
+        #input-type>option 
+        {
+            background-color: #555;
+            color: #bbb;
+        }
+        #simulation-properties
+        {
+            display: flex;
+            align-items: center;
+            flex-flow: column nowrap;
+            justify-content: space-between;
+            row-gap: 5vh;
+            width:70vw;
+            background-color: #555;
+            border-radius: 15px;
+            padding: 10vh 0;
+        }
+        #simulation-properties>div
+        {
+            display: flex;
+            align-items: center;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            background-color: #666;
+            border-radius: 10px;
+            width:50vw;
+            
+        }
+        #simulation-properties>div>p
+        {
+            display:block;
+            width:300px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .tooltip {
+  position: relative;
+  display: inline-block;
+ 
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 400px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: 110%;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
     </style>
 
 </head>
@@ -263,7 +353,8 @@
     <div class="vertical-parent-container">
         <div class="gap"> </div>
         <div class="vertical-container transfer-function">
-            <div class="transfer-input">
+            <div class="transfer-input tooltip">
+            <span class="tooltiptext">Input the coefficients of your transfer functions. Ex: 1s+2 -> 1 2</span>
                 <input type="text" id="numerator" placeholder="1 0 2"/>
                 <hr class="division-sign">
                 <input type="text" id="denominator" placeholder = "1 2 3 4"/>
@@ -359,10 +450,10 @@
                     <p>%Peak Overshoot is: </p> <p id="peak-over-percent"> </p>
                 </div>
                 <div>
-                    <p>1% settling time is: </p> <p id=""> </p>
+                    <p>1% settling time is: </p> <p id="settling"> </p>
                 </div>
                 <div>
-                    <p>10%-90% time is: </p> <p id=""> </p>
+                    <p>10%-90% time is: </p> <p id="tento"> </p>
                 </div>
             </div>
         </div>
@@ -958,8 +1049,10 @@
 
                 if (inputU == 0 && !document.getElementById("closed-loop").checked) //if input is a step function
                 {
-                    document.getElementById("simulation-properties").style.display = "block";
+                    document.getElementById("simulation-properties").style.display = "flex";
                     document.getElementById("steady-state-value").innerHTML = nums[0] / dens[0];
+                    
+                    
                 } else
                 {
                     document.getElementById("simulation-properties").style.display = "none";
@@ -998,7 +1091,13 @@
                    
                     document.getElementById("peak-over-time").innerHTML = domain[maxTime];
                     document.getElementById("peak-over-percent").innerHTML = ((max - (nums[0] / dens[0])) * 100 / (nums[0] / dens[0])) + "%";
-                    document.getElementById("steady-state-value").innerHTML = nums[0] / dens[0];
+                     const steady = nums[0] / dens[0];
+                     document.getElementById("steady-state-value").innerHTML = steady;
+                    const settlingTime = domain[results.indexOf(results.find(element => Math.abs((element - steady)/steady) < 0.01))];
+                    document.getElementById("settling").innerHTML = settlingTime;
+                    const settlingTime10 = domain[results.indexOf(results.find(element => Math.abs((element - steady)/steady) < 0.1))];
+                    const settlingTime90 = domain[results.indexOf(results.find(element => Math.abs((element - steady)/steady) < 0.9))];
+                    document.getElementById("tento").innerHTML = settlingTime10 - settlingTime90;
                 }
 
 

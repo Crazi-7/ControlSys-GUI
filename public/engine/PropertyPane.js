@@ -81,7 +81,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category">
                     <div class="property-category-heading">Input</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Step" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text"  class="form-control">Step</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -108,7 +108,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category">
                     <div class="property-category-heading">Input</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Impulse" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text"  class="form-control">Impulse</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -133,7 +133,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category">
                     <div class="property-category-heading">Input</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Polynomial" disabled="disabled" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text"  class="form-control">Polynomial</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -145,12 +145,14 @@ example.PropertyPane = Class.extend({
                     </div>
                     </div>
                     `);
-                    let polyfunc = targetBlock.details.input_details.function.reduce(
+                    let reversed_func = [... targetBlock.details.input_details.function].reverse();
+                    console.log("funct:",targetBlock.details.input_details.function);
+                   console.log("r", reversed_func);
+                    let polyfunc = reversed_func.reduce(
                         (accumulator, currentValue) => accumulator +=  " "+currentValue
                       );
                     $("#poly_function").val(polyfunc);
-                      console.log("triggered");
-                      console.log($(".input_step input"));
+                     
                       $(".input_step input").on("change", function(){
                         // targetBlock.details.input_details.impulse_value = parseFloat($("#impulse_value").val());
                         targetBlock.details.input_details.function = textToArray($("#poly_function").val());
@@ -162,6 +164,8 @@ example.PropertyPane = Class.extend({
                        $(".input_step button").on("click", function(){
                         $("#poly_function_ready").empty();
                         render("poly_function", "poly_function_ready"); //render id, destination id
+                        targetBlock.details.input_details.function = textToArray($("#poly_function").val());
+                        figure.setUserData(userData={block:targetBlock});
                        });
       
                     break;
@@ -171,7 +175,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                     <div class="property-category-heading">Input</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Sin" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"><div id="" type="text"  class="form-control">Sin</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -201,7 +205,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                     <div class="property-category-heading">Input</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Constant" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"><div id="" type="text"  class="form-control">Constant</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -212,6 +216,7 @@ example.PropertyPane = Class.extend({
                     </div>
                     </div>
                     `);
+                    
                     $("#constant_value").val(targetBlock.details.input_details.value);
                     $(".input_step input").on("change", function(){
                         targetBlock.details.input_details.value = parseFloat($("#constant_value").val());
@@ -230,7 +235,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                     <div class="property-category-heading">Function</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Adder" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text"  class="form-control">Adder</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -249,9 +254,14 @@ example.PropertyPane = Class.extend({
                             <div class="layer"></div>
                         </div>
                     </div></div>
-                        
                     </div>
                     </div>
+                    <div class="property-category">
+                    <div class="property-category-heading">Note</div>
+                <div class="property-category-body" style="margin-bottom:200px">
+                    <div class="property-section">Due to time constrains adder settings are not implemented. Please use a gain with -1 if you want to subtract.</div>
+                </div>
+                </div>
                     `);
                     $("#adder_inputs").val(targetBlock.details.inputs);
                     $("#adder_signs").val(targetBlock.details.input_signs);
@@ -265,7 +275,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                     <div class="property-category-heading">Function</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Integrator" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text" class="form-control">Integrator</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -289,7 +299,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category">
                     <div class="property-category-heading">Input</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Step" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"><div id="" type="text"  class="form-control">Transfer Function</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -311,11 +321,13 @@ example.PropertyPane = Class.extend({
                     </div>
                   
                     `);
-
-                    $("#num_function").val(targetBlock.details.transfer_function[0].reduce(
+                       let reversed_num = [... targetBlock.details.transfer_function[0]].reverse();
+                       let reversed_den = [... targetBlock.details.transfer_function[1]].reverse();
+                       
+                    $("#num_function").val(reversed_num.reduce(
                         (accumulator, currentValue) => accumulator +=  " "+currentValue
                     ));
-                    $("#den_function").val(targetBlock.details.transfer_function[1].reduce(
+                    $("#den_function").val(reversed_den.reduce(
                         (accumulator, currentValue) => accumulator +=  " "+currentValue
                     ));
 
@@ -333,11 +345,14 @@ example.PropertyPane = Class.extend({
                        });
 
                        $(".rendoor button").on("click", function(){
+                        targetBlock.details.transfer_function[0] = textToArray($("#num_function").val());
+                        targetBlock.details.transfer_function[1] = textToArray($("#den_function").val());
                         $("#num_function_ready").empty();
                         render("num_function", "num_function_ready"); //render text, destination id 
                         setTimeout(function(){}, 50);   
                         $("#den_function_ready").empty();
-                        render("den_function", "den_function_ready"); //render text, destination id   
+                        render("den_function", "den_function_ready"); //render text, destination id  
+                        figure.setUserData(userData={block:targetBlock}); 
                        });
       
 
@@ -348,7 +363,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                     <div class="property-category-heading">Function</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Gain" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text"  class="form-control">Gain</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
@@ -370,7 +385,7 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                     <div class="property-category-heading">Function</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Buffer" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text"  class="form-control">Buffer</div></div></div>
                     </div>
                     </div>
                     `);  
@@ -381,12 +396,13 @@ example.PropertyPane = Class.extend({
                     <div class="property-category input_step">
                     <div class="property-category-heading">Output</div>
                     <div class="property-category-body">
-                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <input id="" type="text" value="Scope" class="form-control"/></div></div>
+                        <div class="property-section"><div class="property-label">Type</div><div class="property-value"> <div id="" type="text"  class="form-control">Scope</div></div></div>
                     </div>
                     </div>
                     <div class="property-category input_step">
                         <div class="property-category-heading">Values</div>
                     <div class="property-category-body vcentre">
+                    <button class="clickable render-button">Click to Refresh</button>
                     <div id="simulation-graph" style="width:400px;height:300px;margin:0;filter: brightness(1.25);border-radius:10px;"></div>
                     
                     </div>
@@ -433,6 +449,47 @@ example.PropertyPane = Class.extend({
        
                    
                    } );
+
+                   $(".input_step button").on("click", function(){
+                    simulationG = document.getElementById('simulation-graph');
+                    Plotly.newPlot( simulationG, [{
+                    x: targetBlock.details.time,
+                    y: targetBlock.details.series }], 
+                    {
+                            
+                            title:{
+                            text: 'Input Response',
+                            font: {
+                                size: 23,
+                                color: 'lightgrey',
+                            }
+                            } ,
+                            color: "lightgrey",
+                        margin: { t: 50 },
+                        plot_bgcolor: "#4f545b",
+                        paper_bgcolor: "#4f545b",
+                        xaxis: {
+                            title: 'Time (s)',
+                            color: 'lightgrey',
+                            titlefont: {
+                                family: 'Arial, sans-serif',
+                                size: 18,
+                                color: 'lightgrey'
+                            },
+                        },
+                        yaxis: {
+                            title: 'Output',
+                            color: 'lightgrey',
+                            titlefont: {
+                                family: 'Arial, sans-serif',
+                                size: 18,
+                                color: 'lightgrey'
+                            },
+                        }
+        
+                    
+                    } );
+                   });
                     break;
     
             }

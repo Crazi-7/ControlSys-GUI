@@ -12,6 +12,7 @@
             margin: 0px;
             padding: 0px;
             box-sizing: border-box;
+            font-family: Arial, sans-serif;
             
         }
         body 
@@ -118,11 +119,16 @@
             text-align: center;
             font-size: 25px;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            flex-flow: row nowrap;
+            justify-content: center;
         }
 
         .project-profile
         {
             width: 4vw;
+            height: 4vw;
             margin-left: 3vw;
             border-radius: 50%;
             
@@ -130,6 +136,7 @@
         .project-name 
         {
             width: 43vw;
+            
         }
         .project-date 
         {
@@ -174,7 +181,19 @@
             color: inherit; /* blue colors for links too */
             text-decoration: inherit; /* no underline */
             height: inherit;
+            width:inherit;
             
+            
+        }
+        .name 
+        {
+            display:block;
+            height: inherit;
+        }
+        .project-name:hover 
+        {
+            filter:brightness(0.8);
+            background-color: #444444;
         }
     </style>
 </head>
@@ -206,7 +225,7 @@
         @foreach ($projects as $project)
         <div class="project">
             <img class="project-profile" src="{{$project->profile}}" />
-            <div class="project-name"><p>{{$project->name}}</p></div>
+            <div class="project-name"><a href="project/{{$project->id}}/" class="name"><p>{{$project->name}}</p></a></div>
             <div class="project-date"><p>{{$project->timestamp}}</p></div>
             <div class="edit-button clickable"><a href="project/{{$project->id}}/edit"><p>Edit</p></a></div>
             <div class="delete-button clickable"><a href="project/{{$project->id}}/delete"><p>Delete</p></a></div>

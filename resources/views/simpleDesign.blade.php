@@ -18,6 +18,7 @@
 	<script src="{{URL('engine/View.js')}}"></script>
 	<script src="{{URL('engine/Toolbar.js')}}"></script>
     <script src="{{URL('engine/PropertyPane.js')}}"></script>
+    <script src="{{URL('dbclick.js')}}"></script>
     <script type="text/javascript">
     var app;
     let jsontext = '{ "blocks" : [], "nets": []}';
@@ -57,6 +58,7 @@
         app.view.installEditPolicy(new draw2d.policy.canvas.SnapToGeometryEditPolicy());
         app.view.installEditPolicy(new draw2d.policy.canvas.SnapToInBetweenEditPolicy());
         app.view.installEditPolicy(new draw2d.policy.canvas.SnapToCenterEditPolicy());
+        app.view.installEditPolicy(new DblClickCanvasPolicy());
         app.view.installEditPolicy( new draw2d.policy.connection.DragConnectionCreatePolicy({
             createConnection: function(sourcePort, targetPort){
                 var c = new draw2d.Connection();
@@ -76,6 +78,7 @@
             if (event.figure.cssClass != "draw2d_Connection")
                 simJson.blocks.splice(simJson.blocks.indexOf(simJson.blocks.find(block => block.id == event.figure.id)), 1).concat(simJson.blocks.splice(simJson.blocks.indexOf(simJson.blocks.find(block => block.id == event.figure.id)), -1));
         });
+      
 
     });
 
@@ -169,6 +172,7 @@
             justify-content: flex-start;
             column-gap: 0;
             align-items: center;
+            
     
         }
         .subheader-element > *
@@ -791,6 +795,46 @@ hr
     font-weight: bold;
 }
 
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+ 
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  opacity: 0;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 30%;
+  left: 110%;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
+.tooltip:hover .tooltiptext,.tooltip .tooltiptext::after {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity  0s linear 0.5s;
+}
+
+
     </style>
 </head>
 <body id="container">
@@ -805,11 +849,11 @@ hr
 
         <!-- TOOL BAR-->
         <div class="toolbar">
-        <div class="tool clickable ft"> <i class=" material-symbols-outlined vcentre" id="first-tool">arrow_selector_tool</i> </div>
-        <div class="tool clickable" id="hand-pan"><i class="material-icons vcentre">back_hand</i></div>
-        <div class="tool clickable" id="edit-bar-button"><i class="material-icons vcentre">edit</i></div>
-        <div class="tool clickable" id="show"><i class=" material-icons vcentre">add_box</i></div>
-        <div class="tool clickable lt" id="delete-button"><i class="last-tool material-icons vcentre" id="last-tool">delete</i></div>
+        <div class="tool clickable tooltip ft"> <span class="tooltiptext">Select</span><i class=" material-symbols-outlined vcentre" id="first-tool">arrow_selector_tool</i> </div>
+        <div class="tool clickable tooltip" id="hand-pan"><span class="tooltiptext">Not Implemented</span><i class="material-icons vcentre">back_hand</i></div>
+        <div class="tool clickable tooltip" id="edit-bar-button"><span class="tooltiptext">Edit Element</span><i class="material-icons vcentre">edit</i></div>
+        <div class="tool clickable tooltip" id="show"><span class="tooltiptext">Add Element</span><i class=" material-icons vcentre">add_box</i></div>
+        <div class="tool clickable tooltip lt" id="delete-button"><span class="tooltiptext">Delete Element</span><i class="last-tool material-icons vcentre" id="last-tool">delete</i></div>
         
         </div>
         <div class="sim-settings">
